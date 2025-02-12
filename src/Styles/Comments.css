@@ -1,0 +1,8 @@
+/* Comments.css */
+.textarea {
+    width: 70%;
+    height: 150px;
+    resize: vertical;
+    padding: 10px;
+  }
+  

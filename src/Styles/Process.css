@@ -1,0 +1,46 @@
+.process-form {
+    width: 70%;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.process-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.process-table-header {
+    padding: 10px;
+    text-align: left;
+    background-color: #f4f4f4;
+}
+
+.process-table-cell {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.process-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.process-submit-button {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.process-submit-button:hover {
+    background-color: #45a049;
+}
+
+.process-table-footer {
+    text-align: center;
+}
