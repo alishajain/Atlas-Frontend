@@ -12,10 +12,13 @@ const ShowProcesses = ({ RSN }) => {
     const fetchProcesses = async () => {
       try {
         const response = await searchByRSN(RSN);
+        if (response.length === 0) {
+          setError("No processes found");
+        }
         setProcesses(response);
-        setLoading(false);
       } catch (err) {
         setError("Error fetching processes");
+      } finally {
         setLoading(false);
       }
     };
@@ -27,50 +30,63 @@ const ShowProcesses = ({ RSN }) => {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  // Handle navigate to the update page with the processes data
+  // Navigate to update page
   const handleUpdateClick = () => {
     navigate(`/update-process/${RSN}`, {
       state: { processes, action: "update" },
     });
   };
 
+  // Navigate to add page
+  const handleAddClick = () => {
+    navigate(`/add-processes/${RSN}`, {
+      state: { RSN, action: "addUpdate" },
+    });
+  };
+
   return (
     <div>
       <h2>Process Details</h2>
-      <table className="process-table">
-        <thead>
-          <tr>
-            <th>Process Name</th>
-            <th>Yarn used</th>
-            <th>Yarn Cost</th>
-            <th>Material 2</th>
-            <th>Material 2 Cost</th>
-            <th>Manpower Cost</th>
-            <th>User ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          {processes.map((process, index) => (
-            <tr key={index}>
-              <td>{process.ProcessName}</td>
-              <td>{process.Material1}</td>
-              <td>{process.Material1Cost}</td>
-              <td>{process.Material2}</td>
-              <td>{process.Material2Cost}</td>
-              <td>{process.ManpowerCost}</td>
-              <td>{process.UserId}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={handleUpdateClick}>Update Process Details</button>
-      </div>
+      {error || processes.length === 0 ? (
+        <div>
+          <p>{error}</p>
+          <button onClick={handleAddClick}>Add Processes</button>
+        </div>
+      ) : (
+        <>
+          <table className="process-table">
+            <thead>
+              <tr>
+                <th>Process Name</th>
+                <th>Yarn used</th>
+                <th>Yarn Cost</th>
+                <th>Material 2</th>
+                <th>Material 2 Cost</th>
+                <th>Manpower Cost</th>
+                <th>User ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {processes.map((process, index) => (
+                <tr key={index}>
+                  <td>{process.ProcessName}</td>
+                  <td>{process.Material1}</td>
+                  <td>{process.Material1Cost}</td>
+                  <td>{process.Material2}</td>
+                  <td>{process.Material2Cost}</td>
+                  <td>{process.ManpowerCost}</td>
+                  <td>{process.UserId}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div style={{ marginTop: "20px" }}>
+            <button onClick={handleUpdateClick}>Update Process Details</button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

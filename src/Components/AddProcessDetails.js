@@ -8,8 +8,9 @@ import { getYarnIds } from "../API/YarnApi";
 const AddProcessDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const RSN = location.state ? location.state.RSN : 74;
+  const RSN = location.state ? location.state.RSN : null;
   const userId = useSelector((state) => state.user.userId);
+  const action = location.state ? location.state.action : null;
 
   // Process names list
   const processNames = [
@@ -36,22 +37,22 @@ const AddProcessDetails = () => {
     "Thoke/Tanke",
     "Washcare",
     "Other",
-  ];  
+  ];
 
   // State for storing employee IDs and yarn IDs
   const [employees, setEmployees] = useState([]);
   const [yarnIds, setYarnIds] = useState([]);
   const [formData, setFormData] = useState([
     {
-      ProcessName: '',
-      EmpID: '',
-      YarnUsed: '',
+      ProcessName: "",
+      EmpID: "",
+      YarnUsed: "",
       YarnCost: 0,
-      Material2: '',
+      Material2: "",
       Material2Cost: 0,
       ManpowerCost: 0,
       UserId: "admin",
-      CustomProcessName: '',
+      CustomProcessName: "",
     },
   ]);
 
@@ -84,7 +85,7 @@ const AddProcessDetails = () => {
     const { name, value } = e.target;
     const updatedFormData = [...formData];
     updatedFormData[index][name] = value;
-    
+
     // If the ProcessName is "Other", update the custom process name
     if (name === "ProcessName" && value !== "Other") {
       updatedFormData[index].CustomProcessName = "";
@@ -95,7 +96,8 @@ const AddProcessDetails = () => {
   // Handle save button click (for a single row)
   const handleSave = async (index) => {
     const row = formData[index];
-    const processName = row.ProcessName === "Other" ? row.CustomProcessName : row.ProcessName;
+    const processName =
+      row.ProcessName === "Other" ? row.CustomProcessName : row.ProcessName;
     const dataToSubmit = {
       ...row,
       ProcessName: processName,
@@ -103,7 +105,7 @@ const AddProcessDetails = () => {
     };
 
     try {
-      const response = await addProcess(dataToSubmit);
+      await addProcess(dataToSubmit);
       alert(`${dataToSubmit.ProcessName} details added successfully`);
     } catch (error) {
       console.error("Error adding process:", error);
@@ -128,42 +130,50 @@ const AddProcessDetails = () => {
     ]);
   };
 
+  // Handle Next button navigation based on action
+  const handleNext = () => {
+    if (action === "addUpdate") {
+      navigate(`/show-sample/${RSN}`, { state: { RSN } });
+    } else {
+      navigate(`/panel-selection/${RSN}`, { state: { RSN, action: "Add" } });
+    }
+  };
+
   return (
     <div>
       <h2 className="process-heading">Add Process Details</h2>
-      <button type="button" className="nav-button" onClick={() => navigate(`/panel-selection/${RSN}`, { state: { RSN, action: 'Add'} })}>
+      <button type="button" className="nav-button" onClick={handleNext}>
         Next
       </button>
-      
+
       <form className="process-form">
         <table className="process-table">
           <thead>
             <tr>
-              <th className="process-table-header">Process Name</th>
-              <th className="process-table-header">Employee Id</th>
-              <th className="process-table-header">Yarn Used</th>
-              <th className="process-table-header">Yarn Cost</th>
-              <th className="process-table-header">Material 2</th>
-              <th className="process-table-header">Material 2 Cost</th>
-              <th className="process-table-header">Manpower Cost</th>
-              <th className="process-table-header">Action</th>
+              <th>Process Name</th>
+              <th>Employee Id</th>
+              <th>Yarn Used</th>
+              <th>Yarn Cost</th>
+              <th>Material 2</th>
+              <th>Material 2 Cost</th>
+              <th>Manpower Cost</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {formData.map((row, index) => (
               <tr key={index}>
-                <td className="process-table-cell">
+                <td>
                   <select
                     name="ProcessName"
                     value={row.ProcessName}
                     onChange={(e) => handleInputChange(index, e)}
                     required
-                    className="process-input"
                   >
                     <option value="">Select Process</option>
-                    {processNames.map((processName, i) => (
-                      <option key={i} value={processName}>
-                        {processName}
+                    {processNames.map((process, i) => (
+                      <option key={i} value={process}>
+                        {process}
                       </option>
                     ))}
                   </select>
@@ -173,17 +183,15 @@ const AddProcessDetails = () => {
                       name="CustomProcessName"
                       value={row.CustomProcessName}
                       onChange={(e) => handleInputChange(index, e)}
-                      className="process-input"
                       placeholder="Enter Custom Process Name"
                     />
                   )}
                 </td>
-                <td className="process-table-cell">
+                <td>
                   <select
                     name="EmpID"
                     value={row.EmpID}
                     onChange={(e) => handleInputChange(index, e)}
-                    className="process-input"
                   >
                     <option value="">Select Employee</option>
                     {employees.map((emp) => (
@@ -193,12 +201,11 @@ const AddProcessDetails = () => {
                     ))}
                   </select>
                 </td>
-                <td className="process-table-cell">
+                <td>
                   <select
                     name="YarnUsed"
                     value={row.YarnUsed}
                     onChange={(e) => handleInputChange(index, e)}
-                    className="process-input"
                   >
                     <option value="">Select Yarn</option>
                     {yarnIds.map((yarn) => (
@@ -208,48 +215,40 @@ const AddProcessDetails = () => {
                     ))}
                   </select>
                 </td>
-                <td className="process-table-cell">
+                <td>
                   <input
                     type="number"
                     name="YarnCost"
                     value={row.YarnCost}
                     onChange={(e) => handleInputChange(index, e)}
-                    className="process-input"
                   />
                 </td>
-                <td className="process-table-cell">
+                <td>
                   <input
                     type="text"
                     name="Material2"
                     value={row.Material2}
                     onChange={(e) => handleInputChange(index, e)}
-                    className="process-input"
                   />
                 </td>
-                <td className="process-table-cell">
+                <td>
                   <input
                     type="number"
                     name="Material2Cost"
                     value={row.Material2Cost}
                     onChange={(e) => handleInputChange(index, e)}
-                    className="process-input"
                   />
                 </td>
-                <td className="process-table-cell">
+                <td>
                   <input
                     type="number"
                     name="ManpowerCost"
                     value={row.ManpowerCost}
                     onChange={(e) => handleInputChange(index, e)}
-                    className="process-input"
                   />
                 </td>
-                <td className="process-table-cell">
-                  <button
-                    type="button"
-                    className="process-submit-button"
-                    onClick={() => handleSave(index)}
-                  >
+                <td>
+                  <button type="button" onClick={() => handleSave(index)}>
                     Save
                   </button>
                 </td>
@@ -259,11 +258,7 @@ const AddProcessDetails = () => {
         </table>
       </form>
 
-      <button
-        type="button"
-        className="add-process-button"
-        onClick={handleAddProcess}
-      >
+      <button type="button" onClick={handleAddProcess}>
         Add Another Process
       </button>
     </div>
