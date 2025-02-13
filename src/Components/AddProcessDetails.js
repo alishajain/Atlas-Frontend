@@ -46,8 +46,8 @@ const AddProcessDetails = () => {
     {
       ProcessName: "",
       EmpID: "",
-      YarnUsed: "",
-      YarnCost: 0,
+      Material1: "",
+      Material1Cost: 0,
       Material2: "",
       Material2Cost: 0,
       ManpowerCost: 0,
@@ -119,8 +119,8 @@ const AddProcessDetails = () => {
       {
         ProcessName: "",
         EmpID: "",
-        YarnUsed: "",
-        YarnCost: 0,
+        Material1: "",
+        Material1Cost: 0,
         Material2: "",
         Material2Cost: 0,
         ManpowerCost: 0,
@@ -203,8 +203,8 @@ const AddProcessDetails = () => {
                 </td>
                 <td>
                   <select
-                    name="YarnUsed"
-                    value={row.YarnUsed}
+                    name="Material1"
+                    value={row.Material1}
                     onChange={(e) => handleInputChange(index, e)}
                   >
                     <option value="">Select Yarn</option>
@@ -218,8 +218,8 @@ const AddProcessDetails = () => {
                 <td>
                   <input
                     type="number"
-                    name="YarnCost"
-                    value={row.YarnCost}
+                    name="Material1Cost"
+                    value={row.Material1Cost}
                     onChange={(e) => handleInputChange(index, e)}
                   />
                 </td>

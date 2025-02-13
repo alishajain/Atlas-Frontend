@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { updateProcess, deleteProcess } from "../API/ProcessApi";
+import { updateProcess, deleteProcess, addProcess } from "../API/ProcessApi";
 import { getYarnIds } from "../API/YarnApi";
 import { empId } from "../API/EmployeeApi";
 
@@ -9,7 +9,7 @@ const UpdateProcesses = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const RSN = 76;
+  const RSN = location.state ? location.state.RSN : null;
   const userId = useSelector((state) => state.user.userId);
 
   // State for storing yarn IDs, employee data, and form data
@@ -42,11 +42,6 @@ const UpdateProcesses = () => {
     fetchYarnIds();
   }, []);
 
-  // Debugging: Check if YarnUsed is properly set
-  useEffect(() => {
-    console.log("Initial formData:", formData);
-  }, [formData]);
-
   // Handle form input change
   const handleInputChange = (index, e) => {
     const { name, value } = e.target;
@@ -61,7 +56,6 @@ const UpdateProcesses = () => {
     try {
       setLoading(true);
       const response = await updateProcess(RSN, row.ProcessName, row);
-      console.log("Updated process response:", response);
       alert("Process updated successfully");
     } catch (error) {
       console.error("Error updating process:", error);
@@ -97,6 +91,36 @@ const UpdateProcesses = () => {
     }
   };
 
+  // Handle add button click (for a new row)
+  const handleAdd = async (index) => {
+    const row = formData[index];
+
+    // Validate required fields
+    if (!row.ProcessName || !row.EmpID) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Include RSN in the data sent to the API
+      const payload = { ...row, RSN };
+      const response = await addProcess(payload);
+
+      // Mark the row as no longer new
+      const updatedFormData = [...formData];
+      updatedFormData[index].isNew = false;
+      setFormData(updatedFormData);
+
+      alert("Process added successfully");
+    } catch (error) {
+      console.error("Error adding process:", error);
+      alert("Failed to add process");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle add another process button
   const handleAddProcess = () => {
     setFormData([
@@ -111,6 +135,7 @@ const UpdateProcesses = () => {
         ManpowerCost: 0,
         UserId: userId || "admin",
         CustomProcessName: "",
+        isNew: true,
       },
     ]);
   };
@@ -194,7 +219,7 @@ const UpdateProcesses = () => {
                 </td>
                 <td>
                   <select
-                    name="YarnUsed"
+                    name="Material1"
                     value={row.Material1 || ""}
                     onChange={(e) => handleInputChange(index, e)}
                   >
@@ -209,7 +234,7 @@ const UpdateProcesses = () => {
                 <td>
                   <input
                     type="number"
-                    name="YarnCost"
+                    name="Material1Cost"
                     value={row.Material1Cost || 0}
                     onChange={(e) => handleInputChange(index, e)}
                   />
@@ -239,12 +264,20 @@ const UpdateProcesses = () => {
                   />
                 </td>
                 <td>
-                  <button type="button" onClick={() => handleSave(index)} disabled={loading}>
-                    {loading ? "Saving..." : "Save"}
-                  </button>
-                  <button type="button" onClick={() => handleDelete(index)} disabled={loading}>
-                    {loading ? "Deleting..." : "Delete"}
-                  </button>
+                  {row.isNew ? (
+                    <button type="button" onClick={() => handleAdd(index)} disabled={loading}>
+                      {loading ? "Adding..." : "Add"}
+                    </button>
+                  ) : (
+                    <>
+                      <button type="button" onClick={() => handleSave(index)} disabled={loading}>
+                        {loading ? "Saving..." : "Save"}
+                      </button>
+                      <button type="button" onClick={() => handleDelete(index)} disabled={loading}>
+                        {loading ? "Deleting..." : "Delete"}
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

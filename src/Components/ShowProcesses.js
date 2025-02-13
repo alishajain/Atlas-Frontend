@@ -33,7 +33,7 @@ const ShowProcesses = ({ RSN }) => {
   // Navigate to update page
   const handleUpdateClick = () => {
     navigate(`/update-process/${RSN}`, {
-      state: { processes, action: "update" },
+      state: { RSN, processes, action: "update" },
     });
   };
 

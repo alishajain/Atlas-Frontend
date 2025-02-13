@@ -38,6 +38,15 @@ const UpdateKnittingDetails = () => {
   // Handle input changes for Weight, Time, and MachineNo
   const handleChange = (e, field, type) => {
     const { value } = e.target;
+
+    // Validate if the value is negative for Weight and Time
+    if (type === "Weight" || type === "Time") {
+      if (parseFloat(value) < 0) {
+        setError(`${type} cannot be negative.`);
+        return;
+      }
+    }
+
     setFormData((prevData) => {
       const newFormData = { ...prevData };
       if (!newFormData[field]) newFormData[field] = {};
@@ -47,6 +56,9 @@ const UpdateKnittingDetails = () => {
       newFormData.Total = calculateTotal(newFormData);
       return newFormData;
     });
+
+    // Clear any previous error
+    setError(null);
   };
 
   const calculateTotal = (data) => {
@@ -73,7 +85,7 @@ const UpdateKnittingDetails = () => {
       if (typeof formData[field] === "object") {
         const { Weight, Time, MachineNo } = formData[field];
         if (Weight === "" || Time === "" || MachineNo === "") {
-          setError(`Weight, Time and MachineNo must be provided for ${field}`);
+          setError(`Weight, Time, and MachineNo must be provided for ${field}`);
           return;
         }
       }
@@ -83,7 +95,7 @@ const UpdateKnittingDetails = () => {
     setError(null);
     setSuccess(null);
 
-    const formDataUserId = {...formData, userId};
+    const formDataUserId = { ...formData, userId };
 
     try {
       const response = await updateKnittingDetails(RSN, formDataUserId);
@@ -139,6 +151,7 @@ const UpdateKnittingDetails = () => {
                       value={formData[field]?.Weight || ""}
                       onChange={(e) => handleChange(e, field, "Weight")}
                       placeholder="Weight"
+                      min="0" // Prevent negative values
                       required
                     />
                   </td>
@@ -148,6 +161,7 @@ const UpdateKnittingDetails = () => {
                       value={formData[field]?.Time || ""}
                       onChange={(e) => handleChange(e, field, "Time")}
                       placeholder="Time"
+                      min="0" // Prevent negative values
                       required
                     />
                   </td>

@@ -38,6 +38,15 @@ const AddKnittingDetailsForm = () => {
   // Handle input changes for Weight, Time, and MachineNo
   const handleChange = (e, field, type) => {
     const { value } = e.target;
+
+    // Check if the value is negative
+    if (type === "Weight" || type === "Time") {
+      if (parseFloat(value) < 0) {
+        setError(`${type} cannot be negative.`);
+        return;
+      }
+    }
+
     setFormData((prevData) => {
       const newFormData = { ...prevData };
       if (!newFormData[field]) newFormData[field] = {};
@@ -47,6 +56,9 @@ const AddKnittingDetailsForm = () => {
       newFormData.Total = calculateTotal(newFormData);
       return newFormData;
     });
+
+    // Clear any previous error
+    setError(null);
   };
 
   const calculateTotal = (data) => {
@@ -146,6 +158,7 @@ const AddKnittingDetailsForm = () => {
                       value={formData[field]?.Weight || ""}
                       onChange={(e) => handleChange(e, field, "Weight")}
                       placeholder="Weight"
+                      min="0" // Prevent negative values
                       required
                     />
                   </td>
@@ -155,6 +168,7 @@ const AddKnittingDetailsForm = () => {
                       value={formData[field]?.Time || ""}
                       onChange={(e) => handleChange(e, field, "Time")}
                       placeholder="Time"
+                      min="0" // Prevent negative values
                       required
                     />
                   </td>
