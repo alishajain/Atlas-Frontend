@@ -194,6 +194,7 @@ const UpdateProcesses = () => {
                     value={row.ProcessName || ""}
                     onChange={(e) => handleInputChange(index, e)}
                     required
+                    disabled={!row.isNew} // Disable the select field if the row is not new
                   >
                     <option value="">Select Process</option>
                     {processNames.map((processName, i) => (
